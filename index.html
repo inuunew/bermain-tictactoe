@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>bermain tic-tac-toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e3f2fd;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+    }
+    .cell {
+      background-color: white;
+      border: 2px solid #1976d2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      cursor: pointer;
+      user-select: none;
+    }
+    .cell.taken {
+      cursor: default;
+    }
+    #status {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+    #reset {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #reset:hover {
+      background-color: #1565c0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kamu vs Inuu</h1>
+  <div id="board"></div>
+  <div id="status">Giliranmu (X)</div>
+  <button id="reset">Reset Game</button>
+
+  <script>
+    const board = document.getElementById("board");
+    const statusText = document.getElementById("status");
+    const resetBtn = document.getElementById("reset");
+    let cells = [];
+    let currentPlayer = "X";
+    let gameOver = false;
+
+    function createBoard() {
+      board.innerHTML = "";
+      cells = [];
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.addEventListener("click", () => handlePlayerMove(i));
+        board.appendChild(cell);
+        cells.push(cell);
+      }
+      statusText.textContent = "Giliranmu (X)";
+      gameOver = false;
+    }
+
+    function handlePlayerMove(index) {
+      if (gameOver || cells[index].textContent) return;
+
+      cells[index].textContent = "X";
+      cells[index].classList.add("taken");
+
+      if (checkWin("X")) {
+        statusText.textContent = "Kamu menang!";
+        gameOver = true;
+        return;
+      } else if (isDraw()) {
+        statusText.textContent = "Seri!";
+        gameOver = true;
+        return;
+      }
+
+      statusText.textContent = "Giliran Bot (O)";
+      setTimeout(botMove, 500);
+    }
+
+    function botMove() {
+      if (gameOver) return;
+
+      const emptyIndices = cells
+        .map((cell, i) => (cell.textContent === "" ? i : null))
+        .filter(i => i !== null);
+
+      const randomIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+      if (randomIndex === undefined) return;
+
+      cells[randomIndex].textContent = "O";
+      cells[randomIndex].classList.add("taken");
+
+      if (checkWin("O")) {
+        statusText.textContent = "Bot menang!";
+        gameOver = true;
+      } else if (isDraw()) {
+        statusText.textContent = "Seri!";
+        gameOver = true;
+      } else {
+        statusText.textContent = "Giliranmu (X)";
+      }
+    }
+
+    function checkWin(player) {
+      const winPatterns = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      return winPatterns.some(pattern => 
+        pattern.every(i => cells[i].textContent === player)
+      );
+    }
+
+    function isDraw() {
+      return cells.every(cell => cell.textContent !== "");
+    }
+
+    resetBtn.addEventListener("click", createBoard);
+
+    createBoard();
+  </script>
+</body>
+</html>
