@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>bermain tic-tac-toe</title>
+  <title>Tic-Tac-Toe vs Hard Bot</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -53,7 +53,7 @@
   </style>
 </head>
 <body>
-  <h1>Kamu vs Inuu</h1>
+  <h1>Tic-Tac-Toe vs Bot (Hard)</h1>
   <div id="board"></div>
   <div id="status">Giliranmu (X)</div>
   <button id="reset">Reset Game</button>
@@ -97,21 +97,15 @@
       }
 
       statusText.textContent = "Giliran Bot (O)";
-      setTimeout(botMove, 500);
+      setTimeout(botMoveHard, 300);
     }
 
-    function botMove() {
-      if (gameOver) return;
-
-      const emptyIndices = cells
-        .map((cell, i) => (cell.textContent === "" ? i : null))
-        .filter(i => i !== null);
-
-      const randomIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-      if (randomIndex === undefined) return;
-
-      cells[randomIndex].textContent = "O";
-      cells[randomIndex].classList.add("taken");
+    function botMoveHard() {
+      const bestMove = getBestMove();
+      if (bestMove !== null) {
+        cells[bestMove].textContent = "O";
+        cells[bestMove].classList.add("taken");
+      }
 
       if (checkWin("O")) {
         statusText.textContent = "Bot menang!";
@@ -124,24 +118,5 @@
       }
     }
 
-    function checkWin(player) {
-      const winPatterns = [
-        [0,1,2],[3,4,5],[6,7,8],
-        [0,3,6],[1,4,7],[2,5,8],
-        [0,4,8],[2,4,6]
-      ];
-      return winPatterns.some(pattern => 
-        pattern.every(i => cells[i].textContent === player)
-      );
-    }
-
-    function isDraw() {
-      return cells.every(cell => cell.textContent !== "");
-    }
-
-    resetBtn.addEventListener("click", createBoard);
-
-    createBoard();
-  </script>
-</body>
-</html>
+    function getBestMove() {
+      let bestScore = -
