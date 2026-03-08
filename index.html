@@ -1,189 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Tic-Tac-Toe By Inuu</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #e3f2fd;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 30px;
-    }
-    h1 {
-      margin-bottom: 20px;
-    }
-    #board {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-template-rows: repeat(3, 100px);
-      gap: 5px;
-    }
-    .cell {
-      background-color: white;
-      border: 2px solid #1976d2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2em;
-      cursor: pointer;
-      user-select: none;
-    }
-    .cell.taken {
-      cursor: default;
-    }
-    #status {
-      margin-top: 20px;
-      font-size: 1.2em;
-    }
-    #reset {
-      margin-top: 15px;
-      padding: 10px 20px;
-      background-color: #1976d2;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #reset:hover {
-      background-color: #1565c0;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>YouTube Subtitle Indonesia</title>
+
+<style>
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.box{
+background:#1e293b;
+padding:30px;
+border-radius:10px;
+width:450px;
+}
+
+input,button,textarea{
+width:100%;
+padding:10px;
+margin-top:10px;
+border:none;
+border-radius:6px;
+}
+
+textarea{
+height:200px;
+background:#0f172a;
+color:white;
+}
+
+button{
+background:#3b82f6;
+color:white;
+cursor:pointer;
+}
+
+.copy{
+background:#10b981;
+}
+</style>
 </head>
+
 <body>
-  <h1>Kamu (noob) vs Inuu (pro)</h1>
-  <div id="board"></div>
-  <div id="status">Giliranmu (X)</div>
-  <button id="reset">Reset Game</button>
 
-  <script>
-    const board = document.getElementById("board");
-    const statusText = document.getElementById("status");
-    const resetBtn = document.getElementById("reset");
-    let cells = [];
-    let currentPlayer = "X";
-    let gameOver = false;
+<div class="box">
 
-    function createBoard() {
-      board.innerHTML = "";
-      cells = [];
-      for (let i = 0; i < 9; i++) {
-        const cell = document.createElement("div");
-        cell.classList.add("cell");
-        cell.addEventListener("click", () => handlePlayerMove(i));
-        board.appendChild(cell);
-        cells.push(cell);
-      }
-      statusText.textContent = "Giliranmu (X)";
-      gameOver = false;
-    }
+<h2>YouTube → Subtitle Indonesia</h2>
 
-    function handlePlayerMove(index) {
-      if (gameOver || cells[index].textContent) return;
+<input id="url" placeholder="Masukkan link YouTube">
 
-      cells[index].textContent = "X";
-      cells[index].classList.add("taken");
+<button onclick="getSubtitle()">Ambil Subtitle</button>
 
-      if (checkWin("X")) {
-        statusText.textContent = "Kamu menang!";
-        gameOver = true;
-        return;
-      } else if (isDraw()) {
-        statusText.textContent = "Seri!";
-        gameOver = true;
-        return;
-      }
+<textarea id="result"></textarea>
 
-      statusText.textContent = "Giliran Bot (O)";
-      setTimeout(botMoveHard, 300);
-    }
+<button class="copy" onclick="copyText()">Copy Subtitle</button>
 
-    function botMoveHard() {
-      const bestMove = getBestMove();
-      if (bestMove !== null) {
-        cells[bestMove].textContent = "O";
-        cells[bestMove].classList.add("taken");
-      }
+</div>
 
-      if (checkWin("O")) {
-        statusText.textContent = "Inuu Menang!";
-        gameOver = true;
-      } else if (isDraw()) {
-        statusText.textContent = "Seri!";
-        gameOver = true;
-      } else {
-        statusText.textContent = "Giliranmu (X)";
-      }
-    }
+<script>
 
-    function getBestMove() {
-      let bestScore = -Infinity;
-      let move = null;
+function getVideoId(url){
+let reg=/(?:youtube\\.com.*v=|youtu\\.be\\/)([^&]+)/;
+let match=url.match(reg);
+return match?match[1]:null;
+}
 
-      for (let i = 0; i < 9; i++) {
-        if (cells[i].textContent === "") {
-          cells[i].textContent = "O";
-          let score = minimax(0, false);
-          cells[i].textContent = "";
-          if (score > bestScore) {
-            bestScore = score;
-            move = i;
-          }
-        }
-      }
-      return move;
-    }
+async function getSubtitle(){
 
-    function minimax(depth, isMaximizing) {
-      if (checkWin("O")) return 10 - depth;
-      if (checkWin("X")) return depth - 10;
-      if (isDraw()) return 0;
+let url=document.getElementById("url").value
+let id=getVideoId(url)
 
-      if (isMaximizing) {
-        let bestScore = -Infinity;
-        for (let i = 0; i < 9; i++) {
-          if (cells[i].textContent === "") {
-            cells[i].textContent = "O";
-            let score = minimax(depth + 1, false);
-            cells[i].textContent = "";
-            bestScore = Math.max(score, bestScore);
-          }
-        }
-        return bestScore;
-      } else {
-        let bestScore = Infinity;
-        for (let i = 0; i < 9; i++) {
-          if (cells[i].textContent === "") {
-            cells[i].textContent = "X";
-            let score = minimax(depth + 1, true);
-            cells[i].textContent = "";
-            bestScore = Math.min(score, bestScore);
-          }
-        }
-        return bestScore;
-      }
-    }
+if(!id){
+alert("Link tidak valid")
+return
+}
 
-    function checkWin(player) {
-      const winPatterns = [
-        [0,1,2],[3,4,5],[6,7,8],
-        [0,3,6],[1,4,7],[2,5,8],
-        [0,4,8],[2,4,6]
-      ];
-      return winPatterns.some(pattern => 
-        pattern.every(i => cells[i].textContent === player)
-      );
-    }
+document.getElementById("result").value="Mengambil subtitle..."
 
-    function isDraw() {
-      return cells.every(cell => cell.textContent !== "");
-    }
+let res=await fetch("/api/subtitle?id="+id)
 
-    resetBtn.addEventListener("click", createBoard);
+let data=await res.json()
 
-    createBoard();
-  </script>
+if(data.subtitle){
+document.getElementById("result").value=data.subtitle
+}else{
+document.getElementById("result").value="Subtitle tidak tersedia"
+}
+
+}
+
+function copyText(){
+
+let text=document.getElementById("result").value
+
+navigator.clipboard.writeText(text)
+
+alert("Subtitle berhasil disalin")
+
+}
+
+</script>
+
 </body>
 </html>
