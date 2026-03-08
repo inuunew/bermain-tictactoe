@@ -4,27 +4,26 @@ const id = req.query.id
 
 try{
 
-const captionURL =
-`https://video.google.com/timedtext?lang=en&v=${id}`
+const response = await fetch(
+`https://youtubetranscript.com/?server_vid2=${id}`
+)
 
-const response = await fetch(captionURL)
+const data = await response.json()
 
-const xml = await response.text()
-
-const matches = [...xml.matchAll(/<text.*?>(.*?)<\/text>/g)]
-
-let subtitle = matches.map(m => m[1]).join(" ")
+let subtitle = data
+.map(i => i.text)
+.join(" ")
 
 const translate = await fetch(
 "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=id&dt=t&q=" +
 encodeURIComponent(subtitle)
 )
 
-const data = await translate.json()
+const t = await translate.json()
 
 let result=""
 
-data[0].forEach(i=>{
+t[0].forEach(i=>{
 result+=i[0]
 })
 
@@ -35,7 +34,7 @@ subtitle:result
 }catch{
 
 res.status(200).json({
-error:"Subtitle tidak tersedia"
+error:"Subtitle tidak ditemukan"
 })
 
 }
